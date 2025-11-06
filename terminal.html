@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Terminal</title>
+    <style>
+        :root { --bg:#000; --fg:#00ff6a; --muted:#5cffad; }
+        body { margin: 0; background: var(--bg); color: var(--fg); font-family: Consolas, "Courier New", monospace; min-height: 100vh; }
+        .wrap { min-height: 100vh; display: grid; place-items: center; padding: 24px; }
+        .term { width: min(960px, 95vw); background: #020; border: 1px solid #0f5; box-shadow: 0 0 32px rgba(0,255,106,.15); border-radius: 6px; overflow: hidden; }
+        .head { padding: 10px 14px; background: #010; border-bottom: 1px solid #0a3; display: flex; gap: 8px; align-items: center; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; background: #0f5; opacity: .6; }
+        .screen { position: relative; padding: 16px; height: min(70vh, 560px); overflow: auto; line-height: 1.7; letter-spacing: .3px; }
+        .scan { position: absolute; inset: 0; pointer-events:none; background: linear-gradient(to bottom, transparent 0%, rgba(0,255,106,.1) 50%, transparent 100%); animation: scan 5s linear infinite; }
+        @keyframes scan { 0% { transform: translateY(-100%);} 100% { transform: translateY(100%);} }
+        .line { white-space: pre-wrap; word-break: break-word; }
+        .prompt { color: var(--muted); }
+        .input { width: 100%; background: transparent; border: none; outline: none; color: var(--fg); font: inherit; }
+        .cmdline { display: grid; grid-template-columns: auto 1fr; gap: 8px; align-items: center; }
+        a { color: var(--fg); text-decoration: underline; }
+        .dim { color: #48d88f; }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <div class="term" role="application" aria-label="Hacker terminal">
+            <div class="head">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+            <div class="screen" id="screen" aria-live="polite" aria-atomic="false">
+                <div class="line">Booting secure shell... <span class="dim">ok</span></div>
+                <div class="line">Type <span class="dim">ls</span>, <span class="dim">less &lt;file&gt;</span>, <span class="dim">run &lt;file&gt;</span></div>
+                <div class="line">Files available: <span class="dim">print_me.sh</span>, <span class="dim">code</span></div>
+            </div>
+            <div class="screen" style="height:auto; border-top: 1px solid #0a3;">
+                <form id="form" class="cmdline" autocomplete="off">
+                    <label class="prompt" for="input">user@host:~$</label>
+                    <input id="input" class="input" type="text" autofocus aria-label="command input" />
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function(){
+            var screen = document.getElementById('screen');
+            var form = document.getElementById('form');
+            var input = document.getElementById('input');
+
+            var files = {
+                'print_me.sh': '#!/bin/sh\n# Remote print script\necho "Connecting to remote printer..."\necho "Sending job..."\necho "Done."\n',
+                'code': '[PROTECTED] Password required to view. Use: less code'
+            };
+
+            var mode = 'normal';
+            var awaiting = null; // e.g., { type: 'password', target: 'code' }
+
+            function echo(text, cls) {
+                var div = document.createElement('div');
+                div.className = 'line' + (cls ? ' ' + cls : '');
+                div.textContent = text;
+                screen.appendChild(div);
+                screen.scrollTop = screen.scrollHeight;
+            }
+
+            function echoHTML(html) {
+                var div = document.createElement('div');
+                div.className = 'line';
+                div.innerHTML = html;
+                screen.appendChild(div);
+                screen.scrollTop = screen.scrollHeight;
+            }
+
+            function handleCommand(raw) {
+                var cmd = raw.trim();
+                if (!cmd) return;
+                echo('user@host:~$ ' + cmd, 'prompt');
+
+                if (mode === 'awaitPassword' && awaiting && awaiting.target === 'code') {
+                    var pwd = cmd;
+                    mode = 'normal'; awaiting = null;
+                    if (pwd === 'TNT') {
+                        echo('Access granted.');
+                        echo('You have successfully unlocked 2/2 part of code: TGA');
+                        echoHTML('Continue here: <a href="https://missing-stuff.netlify.app/pass2" target="_blank" rel="noopener noreferrer">https://missing-stuff.netlify.app/pass2</a>');
+                    } else {
+                        echo('Access denied.');
+                    }
+                    return;
+                }
+
+                var parts = cmd.split(/\s+/);
+                var name = parts[0];
+                var arg = parts.slice(1).join(' ');
+
+                switch (name) {
+                    case 'clear':
+                        screen.innerHTML = '';
+                        break;
+                    case 'help':
+                        echo('Commands: ls, less <file>, run <file>, clear');
+                        break;
+                    case 'ls':
+                        echo(Object.keys(files).join('\n'));
+                        break;
+                    case 'less':
+                        if (!arg) { echo('less: missing file operand'); break; }
+                        if (!(arg in files)) { echo('less: cannot open \'' + arg + '\''); break; }
+                        if (arg === 'code') {
+                            echo('Password required for file "code".');
+                            echo('Enter password:');
+                            mode = 'awaitPassword'; awaiting = { type: 'password', target: 'code' };
+                        } else {
+                            echo(files[arg]);
+                        }
+                        break;
+                    case 'run':
+                        if (!arg) { echo('run: missing file operand'); break; }
+                        if (arg === 'print_me.sh') {
+                            echo('Connecting to remote printer...');
+                            setTimeout(function(){ echo('Sending job...'); }, 600);
+                            setTimeout(function(){ echo('Successfully printed file. Please check your printer.'); }, 1400);
+                        } else {
+                            echo('run: permission denied or not executable: ' + arg);
+                        }
+                        break;
+                    default:
+                        echo(name + ': command not found');
+                }
+            }
+
+            form.addEventListener('submit', function(e){ e.preventDefault(); var v = input.value; input.value = ''; handleCommand(v); });
+        })();
+    </script>
+</body>
+</html>
+
+

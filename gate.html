@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Access Gate</title>
+    <style>
+        :root { --bg:#000; --card:#020; --text:#00ff6a; --muted:#5cffad; --primary:#00ff6a; --border:#0f5; --ok:#00ff6a; --err:#ff4d4d; }
+        body { margin:0; background:var(--bg); color:var(--text); font-family:Consolas, "Courier New", monospace; line-height:1.6; }
+        .wrap { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; }
+        .card { width:min(860px,95vw); background:var(--card); border:1px solid var(--border); border-radius:10px; box-shadow:0 0 32px rgba(0,255,106,.15); overflow:hidden; }
+        .media { background:#010; display:grid; place-items:center; border-bottom:1px solid var(--border); padding:12px; }
+        .media img { max-width:100%; max-height:360px; width:auto; height:auto; display:block; image-rendering:auto; filter:none; }
+        .content { padding:24px; }
+        .grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+        @media (max-width:720px){ .grid{ grid-template-columns:1fr; } }
+        .block { border:1px solid var(--border); border-radius:8px; padding:16px; background:#000; box-shadow: inset 0 0 18px rgba(0,255,106,.08); }
+        .label { font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin-bottom:8px; }
+        .field { display:flex; gap:8px; }
+        input[type="text"] { flex:1; padding:10px 12px; border:1px solid var(--border); border-radius:6px; font-size:16px; background:#001a0e; color:var(--text); box-shadow: inset 0 0 10px rgba(0,255,106,.08); }
+        input[type="text"]::placeholder { color:#37d279; }
+        .status { min-height:22px; font-size:14px; margin-top:8px; }
+        .ok { color:var(--ok); }
+        .err { color:var(--err); }
+        .actions { display:flex; gap:12px; align-items:center; margin-top:16px; }
+        .btn { appearance:none; border:1px solid var(--border); background:#003f23; color:var(--text); padding:10px 16px; border-radius:6px; font-weight:700; cursor:pointer; text-shadow:0 0 6px rgba(0,255,106,.6); box-shadow: 0 0 12px rgba(0,255,106,.15); }
+        .btn:disabled { opacity:.7; cursor:not-allowed; }
+        .link { color:var(--muted); background:none; border:1px dashed var(--border); padding:6px 10px; border-radius:6px; font:inherit; cursor:pointer; text-decoration:none; }
+        .hint { display:none; margin-top:8px; color:var(--muted); }
+        .center { text-align:center; }
+        .hidden { display:none; }
+        .success { padding:32px; text-align:center; }
+        .success h2 { margin:0 0 10px; color:var(--text); text-shadow:0 0 8px rgba(0,255,106,.5); }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <div class="card" id="card">
+            <div class="media">
+                <img src="./content.png" alt="Access content">
+            </div>
+            <div class="content">
+                <div class="grid">
+                    <div class="block" id="b1">
+                        <div class="label">First code</div>
+                        <div class="field">
+                            <input id="code1" type="text" placeholder="Enter code (3 letters)" autocomplete="off" />
+                        </div>
+                        <div id="s1" class="status"></div>
+                    </div>
+                    <div class="block" id="b2">
+                        <div class="label">Second code</div>
+                        <div class="field">
+                            <input id="code2" type="text" placeholder="Enter code (3 letters)" autocomplete="off" />
+                        </div>
+                        <div id="s2" class="status"></div>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button id="access" class="btn">Access</button>
+                    <button id="forgot" class="link hidden">Forgot password?</button>
+                </div>
+                <div id="hint" class="hint">If the gate does not open, look at the reflection, sometimes the truth looks better in a mirror</div>
+            </div>
+        </div>
+        <div id="done" class="card hidden">
+            <div class="success">
+                <h2>Congratulations!</h2>
+                <p>You passed all the tasks and won the game!</p>
+                <p>To get the prize, reach out to <strong>Nazar Humeniuk</strong> in Teams with the final code.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function(){
+            var accessBtn = document.getElementById('access');
+            var forgotBtn = document.getElementById('forgot');
+            var hintEl = document.getElementById('hint');
+            var s1 = document.getElementById('s1');
+            var s2 = document.getElementById('s2');
+            var c1 = document.getElementById('code1');
+            var c2 = document.getElementById('code2');
+            var card = document.getElementById('card');
+            var done = document.getElementById('done');
+
+            var tries = 0;
+
+            function validate() {
+                var v1 = (c1.value || '').trim().toUpperCase();
+                var v2 = (c2.value || '').trim().toUpperCase();
+                var ok1 = v1 === 'RTD';
+                var ok2 = v2 === 'AGT';
+                s1.textContent = ok1 ? '✓ First code accepted' : (v1 ? '✗ Incorrect code' : '');
+                s1.className = 'status ' + (ok1 ? 'ok' : (v1 ? 'err' : ''));
+                s2.textContent = ok2 ? '✓ Second code accepted' : (v2 ? '✗ Incorrect code' : '');
+                s2.className = 'status ' + (ok2 ? 'ok' : (v2 ? 'err' : ''));
+                return ok1 && ok2;
+            }
+
+            accessBtn.addEventListener('click', function(){
+                var ok = validate();
+                if (ok) {
+                    card.classList.add('hidden');
+                    done.classList.remove('hidden');
+                    return;
+                }
+                tries += 1;
+                if (tries === 1) {
+                    forgotBtn.classList.remove('hidden');
+                }
+            });
+
+            forgotBtn.addEventListener('click', function(){
+                hintEl.style.display = 'block';
+            });
+        })();
+    </script>
+</body>
+</html>
+
+

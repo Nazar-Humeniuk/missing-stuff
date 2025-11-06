@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Notice: Ping Pong Table Unavailable</title>
+    <style>
+        :root {
+            --bg: #f6f7f9;
+            --card-bg: #ffffff;
+            --text: #1b1f23;
+            --muted: #4b5563;
+            --accent: #0b5fff;
+            --border: #e5e7eb;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
+            line-height: 1.6;
+        }
+
+        .wrap {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 32px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 760px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+            padding: 28px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #0b5fff, #5fb3ff);
+        }
+
+        h1 {
+            font-size: 20px;
+            margin: 0;
+        }
+
+        .lead {
+            margin: 0 0 16px;
+            color: var(--muted);
+        }
+
+        .content p { margin: 0 0 12px; }
+
+        .qr {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed var(--border);
+            display: grid;
+            grid-template-columns: 140px 1fr;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .qr-box {
+            width: 140px;
+            height: 140px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+        }
+        .qr-box img { width: 100%; height: 100%; object-fit: cover; }
+
+        .qr-note { color: var(--muted); font-size: 14px; }
+
+        @media (max-width: 640px) {
+            .qr { grid-template-columns: 1fr; }
+            .qr-box { margin: 0 auto; }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <div class="card" role="region" aria-labelledby="notice-title">
+            <div class="header">
+                <div class="logo" aria-hidden="true"></div>
+                <h1 id="notice-title">Notice: Ping Pong Table Unavailable</h1>
+            </div>
+            <p class="lead">Facilities update for Kinaxis employees</p>
+
+            <div class="content">
+                <p>Dear Kinaxis employees,</p>
+                <p>Please note that the ping pong table is currently unavailable for play.</p>
+                <p>The ball appears to be missing, and a replacement will be arranged soon.</p>
+                <p>In the meantime, if you’d like to help us locate it or get more information, please scan the QR code below.</p>
+                <p>Thank you for your understanding.</p>
+                <p>— Office Management</p>
+            </div>
+
+            <div class="qr">
+                <div class="qr-box" aria-label="QR code">
+                    <img src="./qr-code.png" alt="Scan for updates QR code">
+                </div>
+                <div class="qr-note">Scan this code for updates or to report the missing ball.</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+

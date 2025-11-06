@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mistery Image</title>
+    <style>
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+        }
+
+        .polaroid {
+            background: #fff;
+            color: #000;
+            width: min(90vw, 820px);
+            margin: 32px auto;
+            padding: 12px 12px 24px 12px;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5);
+            border: 1px solid #e6e6e6;
+        }
+
+        #mistery-img {
+            display: block;
+            width: 100%;
+            height: auto;
+            max-height: calc(100vh - 220px);
+            object-fit: contain;
+            margin: 0 auto;
+            border: none;
+            border-radius: 0;
+        }
+
+        .historic-caption {
+            font-family: "Times New Roman", Georgia, serif;
+            font-style: italic;
+            font-variant: small-caps;
+            font-size: large;
+            letter-spacing: 0.5px;
+            color: #d2c1a5;
+            text-align: center;
+            margin-top: 50px;
+            margin-bottom: 50px;
+            text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
+        }
+    </style>
+</head>
+<body>
+    <div class="polaroid">
+        <img src="./1000005618.jpg" alt="Mistery Image" id="mistery-img">
+        <div class="historic-caption">People don't play that ofter here..</div>
+    </div>
+</body>
+</html>
